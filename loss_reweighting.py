@@ -82,6 +82,7 @@ def lossb_expect(cfeaturec, weight, num_f, sum=True):
     cfeaturecs = random_fourier_features_gpu(cfeaturec, num_f=num_f, sum=sum).cuda()
     loss = Variable(torch.FloatTensor([0]).cuda())
     weight = weight.cuda()
+    # 循环
     for i in range(cfeaturecs.size()[-1]):
         cfeaturec = cfeaturecs[:, :, i]
 

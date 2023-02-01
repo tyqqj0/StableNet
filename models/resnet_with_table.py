@@ -2,9 +2,7 @@ import torch
 import torch.nn as nn
 from .model_utilis import load_state_dict_from_url
 
-
 __all__ = ['ResNet_with_table', 'resnet18_with_table', 'resnet34_with_table', 'resnet50_with_table']
-
 
 model_urls = {
     'resnet18': 'https://download.pytorch.org/models/resnet18-5c106cde.pth',
@@ -125,8 +123,8 @@ class ResNet_with_table(nn.Module):
             norm_layer = nn.BatchNorm2d
         self._norm_layer = norm_layer
 
-        self.inplanes = 64
-        self.dilation = 1
+        self.inplanes = 64 # inplanes 的意思是输入的通道数
+        self.dilation = 1 # 膨胀率
         if replace_stride_with_dilation is None:
             # each element in the tuple indicates if we should replace
             # the 2x2 stride with a dilated convolution instead
@@ -184,8 +182,6 @@ class ResNet_with_table(nn.Module):
             self.register_buffer('pre_weight1_4', torch.ones(args.n_feature, 1))
         if args.n_levels > 4:
             print('WARNING: THE NUMBER OF LEVELS CAN NOT BE BIGGER THAN 4')
-
-
 
     def _make_layer(self, block, planes, blocks, stride=1, dilate=False):
         norm_layer = self._norm_layer
@@ -283,5 +279,3 @@ def resnet50_with_table(pretrained=False, progress=True, **kwargs):
     """
     return _resnet('resnet50', Bottleneck, [3, 4, 6, 3], pretrained, progress,
                    **kwargs)
-
-

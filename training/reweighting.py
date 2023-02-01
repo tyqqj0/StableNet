@@ -37,9 +37,9 @@ def weight_learner(cfeatures, pre_features, pre_weight1, args, global_epoch=0, i
 
     elif cfeatures.size()[0] < pre_features.size()[0]:
         pre_features[:cfeatures.size()[0]] = pre_features[:cfeatures.size()[0]] * args.presave_ratio + cfeatures * (
-                    1 - args.presave_ratio)
+                1 - args.presave_ratio)
         pre_weight1[:cfeatures.size()[0]] = pre_weight1[:cfeatures.size()[0]] * args.presave_ratio + weight * (
-                    1 - args.presave_ratio)
+                1 - args.presave_ratio)
 
     else:
         pre_features = pre_features * args.presave_ratio + cfeatures * (1 - args.presave_ratio)

@@ -19,7 +19,7 @@ def validate(val_loader, model, criterion, epoch=0, test=True, args=None, tensor
         progress = ProgressMeter(
             len(val_loader),
             [batch_time, losses, top1, top5],
-            prefix='Test: ')
+            prefix='\nTest: ')
     else:
         batch_time = AverageMeter('val Time', ':6.3f')
         losses = AverageMeter('val Loss', ':.4e')
@@ -28,7 +28,7 @@ def validate(val_loader, model, criterion, epoch=0, test=True, args=None, tensor
         progress = ProgressMeter(
             len(val_loader),
             [batch_time, losses, top1, top5],
-            prefix='Val: ')
+            prefix='\nVal: ')
 
     model.eval()
 
@@ -58,8 +58,8 @@ def validate(val_loader, model, criterion, epoch=0, test=True, args=None, tensor
         print(' * Acc@1 {top1.avg:.3f} Acc@5 {top5.avg:.3f}'
               .format(top1=top1, top5=top5))
         with open(args.log_path, 'a') as f1:
-            f1.writelines(' * Acc@1 {top1.avg:.3f} Acc@5 {top5.avg:.3f}'
-                          .format(top1=top1, top5=top5))
+            f1.writelines(' * Acc@1 {top1.avg:.3f} Acc@5 {top5.avg:.3f}, loss {loss:.3f} \n'
+                          .format(top1=top1, top5=top5, loss=loss))
         if test:
             tensor_writer.add_scalar('loss/test', loss.item(), epoch)
             tensor_writer.add_scalar('ACC@1/test', top1.avg, epoch)

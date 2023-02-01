@@ -92,11 +92,12 @@ def main_worker(ngpus_per_node, args):
     # model.fc1.bias.requires_grad = True
     # print('Done')
 
-    num_ftrs = model.fc1.in_features
+    num_ftrs = model.fc1.in_features  #
     model.fc1 = nn.Linear(num_ftrs, args.classes_num)
     nn.init.xavier_uniform_(model.fc1.weight, .1)
     nn.init.constant_(model.fc1.bias, 0.)
 
+    # 如果distributed即多进程，那么就用DistributedDataParallel，否则用DataParallel
     if args.distributed:
         if args.gpu is not None:
             torch.cuda.set_device(args.gpu)
@@ -197,6 +198,9 @@ def main_worker(ngpus_per_node, args):
     tensor_writer = SummaryWriter(log_dir)
 
     if args.evaluate:
+        # 输出特征
+        f = model.pre_features
+        print(f)
         validate(test_loader, model, criterion, 0, True, args, tensor_writer)
         return
 
@@ -205,6 +209,7 @@ def main_worker(ngpus_per_node, args):
             train_sampler.set_epoch(epoch)
         lr_setter(optimizer, epoch, args)
 
+        # 加载器, 模型, 损失函数, 优化器, epoch, 参数, tensorboard
         train(train_loader, model, criterion_train, optimizer, epoch, args, tensor_writer)
 
         val_acc1 = validate(val_loader, model, criterion, epoch, False, args, tensor_writer)
