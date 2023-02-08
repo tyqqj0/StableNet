@@ -200,7 +200,9 @@ def main_worker(ngpus_per_node, args):
     if args.evaluate:
         # 输出特征
         f = model.pre_features
+        print('--------------------------------pre_features--------------------------------\n')
         print(f)
+        print('--------------------------------pre_features--------------------------------\n')
         validate(test_loader, model, criterion, 0, True, args, tensor_writer)
         return
 
