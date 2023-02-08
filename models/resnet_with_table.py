@@ -240,8 +240,8 @@ def _resnet(arch, block, layers, pretrained, progress, **kwargs):
         pretrained_state_dict = load_state_dict_from_url(model_urls[arch], progress=progress)
         model_dict = model.state_dict()
         pretrained_dict = {k: v for k, v in pretrained_state_dict.items() if k in model_dict}
-        print('---------------pretrained dict---------------')
-        print(pretrained_dict.items())
+        # print('---------------pretrained dict---------------')
+        # print(pretrained_dict.items())
         model_dict.update(pretrained_dict)
         model.load_state_dict(model_dict)
 
