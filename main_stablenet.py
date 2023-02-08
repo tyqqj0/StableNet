@@ -197,7 +197,7 @@ def main_worker(ngpus_per_node, args):
     print('tensorboard dir {}'.format(log_dir))
     tensor_writer = SummaryWriter(log_dir)
 
-    if args.evaluate:
+    if True:
         # 输出特征
         # print('--------------------------------pre_features--------------------------------\n')
         # print(model.pre_features)
