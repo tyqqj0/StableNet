@@ -26,6 +26,9 @@ from training.validate import validate
 from utilis.meters import AverageMeter
 from utilis.saving import save_checkpoint
 
+import loader as ld
+
+
 best_acc1 = 0
 
 
@@ -197,7 +200,7 @@ def main_worker(ngpus_per_node, args):
     print('tensorboard dir {}'.format(log_dir))
     tensor_writer = SummaryWriter(log_dir)
 
-    if True:
+    if args.pretrained:
         # 输出特征
         print('--------------------------------pre_features--------------------------------\n')
         print(model.pre_features)
