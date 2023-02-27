@@ -22,7 +22,7 @@ import models
 from ops.config import parser
 from training.schedule import lr_setter
 from training.train import train
-from training.validate import validate
+from training.validate import validate, test_1_pic
 from utilis.meters import AverageMeter
 from utilis.saving import save_checkpoint
 
@@ -197,7 +197,10 @@ def main_worker(ngpus_per_node, args):
     tensor_writer = SummaryWriter(log_dir)
 
     if args.evaluate:
-        validate(test_loader, model, criterion, 0, True, args, tensor_writer)
+        # validate(test_loader, model, criterion, 0, True, args, tensor_writer)
+        # 从test_loader中取出第一张图片，然后进行测试
+        img = test_loader.dataset[0][0]
+        test_1_pic(model, img, args)
         return
 
     for epoch in range(args.start_epoch, args.epochs):

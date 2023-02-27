@@ -150,7 +150,7 @@ class ResNet_with_table(nn.Module):
                                        dilate=replace_stride_with_dilation[2])
         self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
         # self.fc = nn.Linear(512 * block.expansion, num_classes)
-        self.fc1 = nn.Linear(512 * block.expansion, num_classes)
+        self.fc1 = nn.Linear(512 * block.expansion, num_classes) # 这个是用来做分类的
 
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
