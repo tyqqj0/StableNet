@@ -9,10 +9,16 @@ from torch.utils import data
 from torch import nn
 
 import os
+import sys
 import matplotlib.pyplot as plt
 import pandas as pd
 import torchvision
 import torchio as tio
+import glob
+import SimpleITK as sitk
+from torch.utils.data import Dataset
+from torchvision import transforms
+from random import randint
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 print('using ', device)
@@ -21,7 +27,7 @@ print('using ', device)
 
 
 # mha读取器
-path = r'D:\Data\kitware_brains'
+path = r'D:\Data\brains\train'
 dic = [2, 3, 4, 6, 8]  # 要读取的编号
 
 __all__ = ['mha_dataloader']
