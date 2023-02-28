@@ -27,40 +27,147 @@ print('using ', device)
 
 
 # mha读取器
-path = r'D:\Data\brains\train'
+
+
+################# 参数 #################
+path = r'D:\Data\brains'
 dic = [2, 3, 4, 6, 8]  # 要读取的编号
 
 __all__ = ['mha_dataloader']
 
+args = {
+    'train_patch_size_x': 96,
+    'train_patch_size_y': 96,
+    'train_patch_size_z': 96,
+}
 
-# 返回data和lable
-def mha_loader(path):
-    # 读取data
-    data = []
-    for i in range(0, 5):
-        data_path = os.path.join(path, 'Normal-00' + str(dic[i]), 'MRA', 'Normal00' + str(dic[i]) + '-MRA.mha')
-        data.append(tio.ScalarImage(data_path).data)
-    data = np.array(data)
-    # 读取label
-    label = []
-    for i in range(0, 5):
-        label_path = os.path.join(path, 'Normal-00' + str(dic[i]), 'MRA', 'Normal00' + str(dic[i]) + '.mha')
-        label.append(tio.ScalarImage(label_path).data)
-    label = np.array(label)
-    return data, label
-
-dataset = mha_loader(path)
-print(dataset[0][0].shape)
+patch_size = (args['train_patch_size_x'], args['train_patch_size_y'], args['train_patch_size_z'])
 
 
-def mha_dataloader(path, batch_size, shuffle=True, num_workers=0):
-    dataset = mha_loader(path)
-    transforms = [
-        tio.ToCanonical(),
-        tio.Resample(1),
-        tio.ZNormalization(masking_method=tio.ZNormalization.mean),
-        tio.Crop((0, 0, 10, 30, 40, 40)),
-    ]
-    transform = tio.Compose(transforms)
-    datasets = transform(dataset)
-    return data.DataLoader(datasets, batch_size=batch_size, shuffle=shuffle, num_workers=num_workers)
+################# mha读取器 #################
+
+
+# 输入路径，返回图像和标签路径的列表
+# 要求：图像和标签的顺序和数量一致
+def mha_dataloader(path, train=True):
+    # 如果路径不存在train，报错
+    if not os.path.exists(os.path.join(path, 'train')):
+        raise FileNotFoundError("train folder not found in " + path)
+
+    img = []
+    lbl = []
+    # 如果train为True，读取训练集，否则读取测试集
+    if train:
+        mha_path = os.path.join(path, 'train')
+    else:
+        mha_path = os.path.join(path, 'test')
+
+    for file in glob.glob(os.path.join(mha_path, "image", "*.mha")):
+        # print(file)
+        # 读取一个mha文件
+        file_name = os.path.basename(file)[:-4]  # 去掉后缀
+        # print(file_name)
+        # 判断标签是否存在
+        lable_file = glob.glob(os.path.join(mha_path, "label", file_name + "*"))
+        if len(lable_file) == 0:
+            print("image", file_name, "has no label")
+            continue
+        if len(lable_file) > 1:
+            print("image", file_name, "has more than one label")
+            continue
+        # print(os.path.basename(lable_file[0])[:-4])
+        img.append(file)
+        lbl.append(lable_file[0])
+
+    return img, lbl
+
+
+################# 随机裁剪 #################
+
+
+def standardization_intensity_normalization(dataset, dtype):
+    mean = dataset.mean()
+    std = dataset.std()
+    dataset = ((dataset - mean) / std).astype(dtype)
+    return dataset
+
+
+def extractPatch(data, p_x, p_y, p_z, x, y, z):
+    patch_rst = data[x - p_x // 2:x + p_x // 2, y - p_y // 2:y + p_y // 2, z - p_z // 2:z + p_z // 2]
+    return patch_rst
+
+
+def RandomPatchCrop(image, label, patch_in_size, patch_gd_size):
+    if (patch_in_size[0] % patch_gd_size[0] != 0 or patch_in_size[1] % patch_gd_size[1] != 0 or patch_in_size[2] %
+            patch_gd_size[2] != 0):
+        sys.exit("patch_in_size must be divisible by patch_gd_size")
+    if (patch_in_size[0] < patch_gd_size[0] or patch_in_size[1] < patch_gd_size[1] or patch_in_size[2] < patch_gd_size[
+        2]):
+        sys.exit("patch_in_size must be greater than patch_gd_size")
+
+    # 生成随机数
+    x = randint(patch_size[0] // 2, image.shape[0] - patch_gd_size[0] // 2)
+    y = randint(patch_size[1] // 2, image.shape[1] - patch_gd_size[1] // 2)
+    z = randint(patch_size[2] // 2, image.shape[2] - patch_gd_size[2] // 2)
+
+    # 生成随机旋转
+    r0 = randint(5, 10)
+    r1 = randint(5, 10)
+    r2 = randint(5, 10)
+    patch_in = extractPatch(image, patch_in_size[0], patch_in_size[1], patch_in_size[2], x, y, z)
+    patch_gd = extractPatch(label, patch_gd_size[0], patch_gd_size[1], patch_gd_size[2], x, y, z)
+
+    # 旋转
+    patch_in = np.rot90(patch_in, r0, (0, 1))
+    patch_in = np.rot90(patch_in, r1, (1, 2))
+    patch_in = np.rot90(patch_in, r2, (0, 2))
+
+    patch_gd = np.rot90(patch_gd, r0, (0, 1))
+    patch_gd = np.rot90(patch_gd, r1, (1, 2))
+    patch_gd = np.rot90(patch_gd, r2, (0, 2))
+
+    return patch_in, patch_gd
+
+
+################# 数据集 #################
+class mha_data(Dataset):
+    def __init__(self, root_dir, train=True, rotate=40, flip=True, random_crop=True, scale1=512):
+        self.root_dir = root_dir
+        self.train = train
+        self.rotate = rotate
+        self.flip = flip
+        self.random_crop = random_crop
+        self.transform = transforms.ToTensor()
+        self.resize = scale1
+
+        self.img, self.lbl = mha_dataloader(self.root_dir, self.train)
+
+    def __len__(self):
+        return len(self.img)
+
+    def __getitem__(self, index):
+        img_path = self.img[index]
+        lbl_path = self.lbl[index]
+
+        # 读取图像和标签
+        image = sitk.ReadImage(img_path)
+        image = sitk.GetArrayFromImage(image).astype(np.float32)
+
+        label = sitk.ReadImage(lbl_path)
+        label = sitk.GetArrayFromImage(label).astype(np.float32)
+
+        img_patch, lbl_patch = RandomPatchCrop(image, label, patch_size, patch_size)
+        img_patch = standardization_intensity_normalization(img_patch, np.float32)
+
+        image = torch.from_numpy(np.ascontiguousarray(img_patch)).unsqueeze(0)
+        label = torch.from_numpy(np.ascontiguousarray(lbl_patch)).unsqueeze(0)
+
+        return image, label
+
+
+# 测试
+# print(mha_dataloader(path, train=True))
+
+# 测试
+dataset = mha_data(path)
+print(dataset[0][0].shape, '\n', dataset[0][1].shape, '\n')
