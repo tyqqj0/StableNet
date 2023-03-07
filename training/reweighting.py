@@ -20,7 +20,7 @@ def weight_learner(cfeatures, pre_features, pre_weight1, args, global_epoch=0, i
         all_weight = torch.cat((weight, pre_weight1.detach()), dim=0)
         optimizerbl.zero_grad()
 
-        lossb = loss_expect.lossb_expect(all_feature, softmax(all_weight), args.num_f, args.sum)
+        lossb = loss_expect.lossb_expect(all_feature, softmax(all_weight), args.num_f, args.sum)  # TODO:搞懂这块
         lossp = softmax(weight).pow(args.decay_pow).sum()
         lambdap = args.lambdap * max((args.lambda_decay_rate ** (global_epoch // args.lambda_decay_epoch)),
                                      args.min_lambda_times)

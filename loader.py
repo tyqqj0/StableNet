@@ -66,7 +66,7 @@ def mha_dataloader(path, train=True):
         # print(file)
         # 读取一个mha文件
         file_name = os.path.basename(file)[:-4]  # 去掉后缀
-        # print(file_name)
+
         # 判断标签是否存在
         lable_file = glob.glob(os.path.join(mha_path, "label", file_name + "*"))
         if len(lable_file) == 0:
@@ -75,6 +75,7 @@ def mha_dataloader(path, train=True):
         if len(lable_file) > 1:
             print("image", file_name, "has more than one label")
             continue
+        # print(file_name)
         # print(os.path.basename(lable_file[0])[:-4])
         img.append(file)
         lbl.append(lable_file[0])
@@ -93,7 +94,9 @@ def standardization_intensity_normalization(dataset, dtype):
 
 
 def extractPatch(data, p_x, p_y, p_z, x, y, z):
-    patch_rst = data[x - p_x // 2:x + p_x // 2, y - p_y // 2:y + p_y // 2, z - p_z // 2:z + p_z // 2]
+    patch_rst = data[x - p_x // 2:x + p_x // 2,
+                y - p_y // 2:y + p_y // 2,
+                z - p_z // 2:z + p_z // 2]
     return patch_rst
 
 
@@ -156,8 +159,20 @@ class mha_data(Dataset):
         label = sitk.ReadImage(lbl_path)
         label = sitk.GetArrayFromImage(label).astype(np.float32)
 
+        # 检查图像和标签是否一致
+        if image.shape != label.shape:
+            # 红色字体提醒数据
+            print("\033[1;31mimage", os.path.basename(img_path)[:-4], "and label are not consistent\033[0m")
+
+        # print(image.shape, '\n', label.shape, '\n')
+
         img_patch, lbl_patch = RandomPatchCrop(image, label, patch_size, patch_size)
+
+        # print(img_patch.shape, '\n', lbl_patch.shape, '\n')
+
         img_patch = standardization_intensity_normalization(img_patch, np.float32)
+
+        # print(img_patch.shape, '\n', lbl_patch.shape, '\n')
 
         image = torch.from_numpy(np.ascontiguousarray(img_patch)).unsqueeze(0)
         label = torch.from_numpy(np.ascontiguousarray(lbl_patch)).unsqueeze(0)
@@ -171,3 +186,4 @@ class mha_data(Dataset):
 # 测试
 dataset = mha_data(path)
 print(dataset[0][0].shape, '\n', dataset[0][1].shape, '\n')
+# print(dataset[0][0].shape, '\n', dataset[0][1].shape, '\n')
