@@ -28,7 +28,6 @@ from utilis.saving import save_checkpoint
 
 import loader as ld
 
-
 best_acc1 = 0
 
 
@@ -152,9 +151,9 @@ def main_worker(ngpus_per_node, args):
 
     cudnn.benchmark = True
 
-    traindir = os.path.join(args.data, 'train')
-    valdir = os.path.join(args.data, 'val')
-    testdir = os.path.join(args.data, 'test')
+    traindir = os.path.join(args.data, 'cartoon')
+    valdir = os.path.join(args.data, 'photo')
+    testdir = os.path.join(args.data, 'scratch')
 
     train_dataset = datasets.ImageFolder(
         traindir,
@@ -166,7 +165,6 @@ def main_worker(ngpus_per_node, args):
             transforms.ToTensor(),
             transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
         ]))
-
 
     if args.distributed:
         print("initializing distributed sampler")
@@ -197,7 +195,8 @@ def main_worker(ngpus_per_node, args):
         batch_size=args.batch_size, shuffle=False,
         num_workers=args.workers, pin_memory=True)
     #################################### 覆盖数据集 ####################################
-    train_loader = ld.mha_dataloader(train_dataset, args.batch_size, shuffle=(train_sampler is None), num_workers=args.workers)
+    train_loader = ld.mha_dataloader(train_dataset, args.batch_size, shuffle=(train_sampler is None),
+                                     num_workers=args.workers)
     val_loader = ld.mha_dataloader(val_loader, args.batch_size, shuffle=False, num_workers=args.workers)
     test_loader = ld.mha_dataloader(test_loader, args.batch_size, shuffle=False, num_workers=args.workers)
     log_dir = os.path.dirname(args.log_path)
