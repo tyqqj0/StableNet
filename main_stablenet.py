@@ -84,7 +84,7 @@ def main_worker(ngpus_per_node, args):
     else:
         print("=> creating model '{}'".format(args.arch))
         model = models.__dict__[args.arch](args=args)
-    print(model.pre_features.shape())
+    print(model.pre_features.shape)
 
     # print('Freezing cnn parameters')
     # for param in model.parameters():
