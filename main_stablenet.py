@@ -22,11 +22,9 @@ import models
 from ops.config import parser
 from training.schedule import lr_setter
 from training.train import train
-from training.validate import validate
+from training.validate import validate, test_1_pic
 from utilis.meters import AverageMeter
 from utilis.saving import save_checkpoint
-
-import loader as ld
 
 best_acc1 = 0
 
@@ -94,12 +92,11 @@ def main_worker(ngpus_per_node, args):
     # model.fc1.bias.requires_grad = True
     # print('Done')
 
-    num_ftrs = model.fc1.in_features  #
+    num_ftrs = model.fc1.in_features
     model.fc1 = nn.Linear(num_ftrs, args.classes_num)
     nn.init.xavier_uniform_(model.fc1.weight, .1)
     nn.init.constant_(model.fc1.bias, 0.)
 
-    # 如果distributed即多进程，那么就用DistributedDataParallel，否则用DataParallel
     if args.distributed:
         if args.gpu is not None:
             torch.cuda.set_device(args.gpu)
@@ -150,10 +147,10 @@ def main_worker(ngpus_per_node, args):
             print("=> no checkpoint found at '{}'".format(args.resume))
 
     cudnn.benchmark = True
-
+    print(args.data)
     traindir = os.path.join(args.data, 'cartoon')
-    valdir = os.path.join(args.data, 'photo')
-    testdir = os.path.join(args.data, 'scratch')
+    valdir = os.path.join(args.data, 'sketch')
+    testdir = os.path.join(args.data, 'photo')
 
     train_dataset = datasets.ImageFolder(
         traindir,
@@ -194,21 +191,16 @@ def main_worker(ngpus_per_node, args):
         ])),
         batch_size=args.batch_size, shuffle=False,
         num_workers=args.workers, pin_memory=True)
-    #################################### 覆盖数据集 ####################################
-    train_loader = ld.mha_dataloader(train_dataset, args.batch_size, shuffle=(train_sampler is None),
-                                     num_workers=args.workers)
-    val_loader = ld.mha_dataloader(val_loader, args.batch_size, shuffle=False, num_workers=args.workers)
-    test_loader = ld.mha_dataloader(test_loader, args.batch_size, shuffle=False, num_workers=args.workers)
+
     log_dir = os.path.dirname(args.log_path)
     print('tensorboard dir {}'.format(log_dir))
     tensor_writer = SummaryWriter(log_dir)
 
-    if args.pretrained:
-        # 输出特征
-        print('--------------------------------pre_features--------------------------------\n')
-        print(model.pre_features)
-        print('--------------------------------pre_features--------------------------------\n')
-        validate(test_loader, model, criterion, 0, True, args, tensor_writer)
+    if args.evaluate:
+        # validate(test_loader, model, criterion, 0, True, args, tensor_writer)
+        # 从test_loader中取出第一张图片，然后进行测试
+        img = test_loader.dataset[0][0]
+        test_1_pic(model, img, args)
         return
 
     for epoch in range(args.start_epoch, args.epochs):
@@ -216,7 +208,6 @@ def main_worker(ngpus_per_node, args):
             train_sampler.set_epoch(epoch)
         lr_setter(optimizer, epoch, args)
 
-        # 加载器, 模型, 损失函数, 优化器, epoch, 参数, tensorboard
         train(train_loader, model, criterion_train, optimizer, epoch, args, tensor_writer)
 
         val_acc1 = validate(val_loader, model, criterion, epoch, False, args, tensor_writer)

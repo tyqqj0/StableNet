@@ -184,6 +184,6 @@ class mha_data(Dataset):
 # print(mha_dataloader(path, train=True))
 
 # 测试
-dataset = mha_data(path)
-print(dataset[0][0].shape, '\n', dataset[0][1].shape, '\n')
+# dataset = mha_data(path)
+# print(dataset[0][0].shape, '\n', dataset[0][1].shape, '\n')
 # print(dataset[0][0].shape, '\n', dataset[0][1].shape, '\n')

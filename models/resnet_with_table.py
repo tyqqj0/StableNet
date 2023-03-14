@@ -171,6 +171,7 @@ class ResNet_with_table(nn.Module):
         # for tables
         # for different levels
         self.register_buffer('pre_features', torch.zeros(args.n_feature, args.feature_dim))
+        print('pre_features', self.pre_features.shape)
         self.register_buffer('pre_weight1', torch.ones(args.n_feature, 1))
         if args.n_levels > 1:
             self.register_buffer('pre_features_2', torch.zeros(args.n_feature, args.feature_dim))
