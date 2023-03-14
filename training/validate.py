@@ -70,3 +70,11 @@ def validate(val_loader, model, criterion, epoch=0, test=True, args=None, tensor
             tensor_writer.add_scalar('ACC@5/val', top5.avg, epoch)
 
     return top1.avg
+
+
+def test_1_pic(model, img, args):
+    model.eval()
+    with torch.no_grad():
+        img = img.cuda(args.gpu, non_blocking=True)
+        output, cfeatures = model(img)
+        return output, cfeatures
