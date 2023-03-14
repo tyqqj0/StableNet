@@ -85,7 +85,7 @@ def main_worker(ngpus_per_node, args):
         print("=> creating model '{}'".format(args.arch))
         model = models.__dict__[args.arch](args=args)
     # print(model.pre_features.shape)
-
+    model.check()
     # print('Freezing cnn parameters')
     # for param in model.parameters():
     #     param.requires_grad = False

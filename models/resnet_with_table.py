@@ -187,6 +187,10 @@ class ResNet_with_table(nn.Module):
         if args.n_levels > 4:
             print('WARNING: THE NUMBER OF LEVELS CAN NOT BE BIGGER THAN 4')
 
+    def check(self):
+        print('pre_features', self.pre_features.shape)
+        print('pre_weight1', self.pre_weight1.shape)
+
     def _make_layer(self, block, planes, blocks, stride=1, dilate=False):
         norm_layer = self._norm_layer
         downsample = None
