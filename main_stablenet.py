@@ -206,7 +206,7 @@ def main_worker(ngpus_per_node, args):
 
 
 
-
+    model.check()
     # print(model.pre_features)
     for epoch in range(args.start_epoch, args.epochs):
         if args.distributed:

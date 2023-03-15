@@ -25,7 +25,7 @@ def train(train_loader, model, criterion, optimizer, epoch, args, tensor_writer=
         replace the last one every time
         TODO init the tensors
     '''
-    model.check()
+    # model.check()
 
     batch_time = AverageMeter('Time', ':6.3f')
     data_time = AverageMeter('Data', ':6.3f')
