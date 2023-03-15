@@ -99,6 +99,7 @@ def main_worker(ngpus_per_node, args):
     nn.init.constant_(model.fc1.bias, 0.)
 
     if args.distributed:
+        print("Distributed training")
         if args.gpu is not None:
             torch.cuda.set_device(args.gpu)
             model.cuda(args.gpu)
