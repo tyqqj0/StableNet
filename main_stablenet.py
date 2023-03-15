@@ -85,7 +85,7 @@ def main_worker(ngpus_per_node, args):
         print("=> creating model '{}'".format(args.arch))
         model = models.__dict__[args.arch](args=args)
     # print(model.pre_features.shape)
-    model.check()
+
     # print('Freezing cnn parameters')
     # for param in model.parameters():
     #     param.requires_grad = False
@@ -99,6 +99,7 @@ def main_worker(ngpus_per_node, args):
     nn.init.constant_(model.fc1.bias, 0.)
 
     if args.distributed:
+        print("Distributed training")
         if args.gpu is not None:
             torch.cuda.set_device(args.gpu)
             model.cuda(args.gpu)
@@ -109,16 +110,20 @@ def main_worker(ngpus_per_node, args):
             model.cuda()
             model = torch.nn.parallel.DistributedDataParallel(model)
     elif args.gpu is not None:
+        print("Single GPU training")
         torch.cuda.set_device(args.gpu)
         model = model.cuda(args.gpu)
     else:
         # DataParallel will divide and allocate batch_size to all available GPUs
+        print("DataParallel training")
         if args.arch.startswith('alexnet') or args.arch.startswith('vgg'):
             model.features = torch.nn.DataParallel(model.features)
             model.cuda()
         else:
+            print("DataParallel training")
+            model.check()
             model = torch.nn.DataParallel(model).cuda()
-
+    model.check()
     # define loss function (criterion) and optimizer
     criterion = nn.CrossEntropyLoss().cuda(args.gpu)
     criterion_train = nn.CrossEntropyLoss(reduce=False).cuda(args.gpu)
@@ -207,7 +212,7 @@ def main_worker(ngpus_per_node, args):
 
 
 
-    print(model.pre_features)
+    # print(model.pre_features)
     for epoch in range(args.start_epoch, args.epochs):
         if args.distributed:
             train_sampler.set_epoch(epoch)

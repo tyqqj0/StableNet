@@ -36,6 +36,7 @@ class BasicBlock(nn.Module):
     def __init__(self, inplanes, planes, stride=1, downsample=None, groups=1,
                  base_width=64, dilation=1, norm_layer=None):
         super(BasicBlock, self).__init__()
+        # print('\n\nBasicBlock\n\n')
         if norm_layer is None:
             norm_layer = nn.BatchNorm2d
         if groups != 1 or base_width != 64:
@@ -120,6 +121,7 @@ class ResNet_with_table(nn.Module):
                  groups=1, width_per_group=64, replace_stride_with_dilation=None,
                  norm_layer=None, args=None):
         super(ResNet_with_table, self).__init__()
+        print('\n\nResNet_with_table\n\n')
         if norm_layer is None:
             norm_layer = nn.BatchNorm2d
         self._norm_layer = norm_layer
@@ -187,9 +189,15 @@ class ResNet_with_table(nn.Module):
         if args.n_levels > 4:
             print('WARNING: THE NUMBER OF LEVELS CAN NOT BE BIGGER THAN 4')
 
+
+    def get_prefeatures(self):
+        return self.pre_features, self.pre_weight1
+
     def check(self):
+        print('\n\ncheck')
         print('pre_features', self.pre_features.shape)
         print('pre_weight1', self.pre_weight1.shape)
+        print("\n\n")
 
     def _make_layer(self, block, planes, blocks, stride=1, dilate=False):
         norm_layer = self._norm_layer
