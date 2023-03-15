@@ -85,7 +85,7 @@ def main_worker(ngpus_per_node, args):
         print("=> creating model '{}'".format(args.arch))
         model = models.__dict__[args.arch](args=args)
     # print(model.pre_features.shape)
-    model.check()
+
     # print('Freezing cnn parameters')
     # for param in model.parameters():
     #     param.requires_grad = False
@@ -121,6 +121,7 @@ def main_worker(ngpus_per_node, args):
             model.cuda()
         else:
             print("DataParallel training")
+            model.check()
             model = torch.nn.DataParallel(model).cuda()
     model.check()
     # define loss function (criterion) and optimizer
