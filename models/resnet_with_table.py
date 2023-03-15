@@ -194,8 +194,10 @@ class ResNet_with_table(nn.Module):
         return self.pre_features, self.pre_weight1
 
     def check(self):
+        print('\n\ncheck')
         print('pre_features', self.pre_features.shape)
         print('pre_weight1', self.pre_weight1.shape)
+        print("\n\n")
 
     def _make_layer(self, block, planes, blocks, stride=1, dilate=False):
         norm_layer = self._norm_layer
