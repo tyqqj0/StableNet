@@ -48,8 +48,7 @@ def train(train_loader, model, criterion, optimizer, epoch, args, tensor_writer=
         target = target.cuda(args.gpu, non_blocking=True)
 
         output, cfeatures = model(images)
-        pre_features = model.pre_features
-        pre_weight1 = model.pre_weight1
+        pre_features, pre_weight1 = model.get_prefeatures()
 
         if epoch >= args.epochp:
             weight1, pre_features, pre_weight1 = weight_learner(cfeatures, pre_features, pre_weight1, args, epoch, i)

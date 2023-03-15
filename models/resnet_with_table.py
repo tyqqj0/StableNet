@@ -187,6 +187,10 @@ class ResNet_with_table(nn.Module):
         if args.n_levels > 4:
             print('WARNING: THE NUMBER OF LEVELS CAN NOT BE BIGGER THAN 4')
 
+
+    def get_prefeatures(self):
+        return self.pre_features, self.pre_weight1
+
     def check(self):
         print('pre_features', self.pre_features.shape)
         print('pre_weight1', self.pre_weight1.shape)
