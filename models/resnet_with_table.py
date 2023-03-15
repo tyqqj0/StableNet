@@ -36,7 +36,7 @@ class BasicBlock(nn.Module):
     def __init__(self, inplanes, planes, stride=1, downsample=None, groups=1,
                  base_width=64, dilation=1, norm_layer=None):
         super(BasicBlock, self).__init__()
-        print('\n\nBasicBlock\n\n')
+        # print('\n\nBasicBlock\n\n')
         if norm_layer is None:
             norm_layer = nn.BatchNorm2d
         if groups != 1 or base_width != 64:
@@ -121,6 +121,7 @@ class ResNet_with_table(nn.Module):
                  groups=1, width_per_group=64, replace_stride_with_dilation=None,
                  norm_layer=None, args=None):
         super(ResNet_with_table, self).__init__()
+        print('\n\nResNet_with_table\n\n')
         if norm_layer is None:
             norm_layer = nn.BatchNorm2d
         self._norm_layer = norm_layer
