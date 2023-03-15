@@ -110,10 +110,12 @@ def main_worker(ngpus_per_node, args):
             model.cuda()
             model = torch.nn.parallel.DistributedDataParallel(model)
     elif args.gpu is not None:
+        print("Single GPU training")
         torch.cuda.set_device(args.gpu)
         model = model.cuda(args.gpu)
     else:
         # DataParallel will divide and allocate batch_size to all available GPUs
+        print("DataParallel training")
         if args.arch.startswith('alexnet') or args.arch.startswith('vgg'):
             model.features = torch.nn.DataParallel(model.features)
             model.cuda()
