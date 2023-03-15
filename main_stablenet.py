@@ -120,6 +120,7 @@ def main_worker(ngpus_per_node, args):
             model.features = torch.nn.DataParallel(model.features)
             model.cuda()
         else:
+            print("DataParallel training")
             model = torch.nn.DataParallel(model).cuda()
     model.check()
     # define loss function (criterion) and optimizer
