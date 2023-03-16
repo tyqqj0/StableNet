@@ -98,6 +98,8 @@ def main_worker(ngpus_per_node, args):
     nn.init.xavier_uniform_(model.fc1.weight, .1)
     nn.init.constant_(model.fc1.bias, 0.)
 
+    # model.check()
+
     if args.distributed:
         print("Distributed training")
         if args.gpu is not None:
@@ -154,9 +156,9 @@ def main_worker(ngpus_per_node, args):
 
     cudnn.benchmark = True
     print(args.data)
-    traindir = os.path.join(args.data, 'cartoon')
-    valdir = os.path.join(args.data, 'sketch')
-    testdir = os.path.join(args.data, 'photo')
+    traindir = os.path.join(args.data, 'train')
+    valdir = os.path.join(args.data, 'val')
+    testdir = os.path.join(args.data, 'test')
 
     train_dataset = datasets.ImageFolder(
         traindir,
@@ -208,9 +210,6 @@ def main_worker(ngpus_per_node, args):
         img = test_loader.dataset[0][0]
         # test_1_pic(model, img, args)
         return
-
-
-
 
     # print(model.pre_features)
     for epoch in range(args.start_epoch, args.epochs):
