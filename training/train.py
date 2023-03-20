@@ -62,8 +62,12 @@ def train(train_loader, model, criterion, optimizer, epoch, args, tensor_writer=
         else:
             weight1 = Variable(torch.ones(cfeatures.size()[0], 1).cuda())
 
-        model.pre_features.data.copy_(pre_features)
-        model.pre_weight1.data.copy_(pre_weight1)
+        if args.distributed is False and args.gpu is None:
+            model.module.pre_features.data.copy_(pre_features)
+            model.module.pre_weight1.data.copy_(pre_weight1)
+        else:
+            model.pre_features.data.copy_(pre_features)
+            model.pre_weight1.data.copy_(pre_weight1)
 
         loss = criterion(output, target).view(1, -1).mm(weight1).view(1)  #
         acc1, acc5 = accuracy(output, target, topk=(1, 5))
