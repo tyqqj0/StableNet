@@ -8,14 +8,18 @@ from training.schedule import lr_setter
 
 def weight_learner(cfeatures, pre_features, pre_weight1, args, global_epoch=0, iter=0):
     softmax = nn.Softmax(0)
-    weight = Variable(torch.ones(cfeatures.size()[0], 1).cuda()) # TODO:这里的weight是什么 取0维应该是样本数
+    weight = Variable(torch.ones(cfeatures.size()[0], 1).cuda())  # TODO:这里的weight是什么 取0维应该是样本数
+    print('--------------------------------------')
     print('weight size', weight.size())
-    print('pre_features size, pre_weight1 size', pre_features.size(), pre_weight1.size())
+    print('cfeatures size', cfeatures.size())
+    print('pre_features size', pre_features.size())
+    print('pre_weight1 size', pre_weight1.size())
+    print('--------------------------------------')
     weight.requires_grad = True
     cfeaturec = Variable(torch.FloatTensor(cfeatures.size()).cuda())
     cfeaturec.data.copy_(cfeatures.data)
-    all_feature = torch.cat([cfeaturec, pre_features.detach()], dim=0) # 样本数一样，所以dim=0
-    optimizerbl = torch.optim.SGD([weight], lr=args.lrbl, momentum=0.9) # 这个是SGD优化器，用来优化weight
+    all_feature = torch.cat([cfeaturec, pre_features.detach()], dim=0)  # 样本数一样，所以dim=0
+    optimizerbl = torch.optim.SGD([weight], lr=args.lrbl, momentum=0.9)  # 这个是SGD优化器，用来优化weight
 
     for epoch in range(args.epochb):
         lr_setter(optimizerbl, epoch, args, bl=True)
