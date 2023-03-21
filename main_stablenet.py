@@ -205,7 +205,7 @@ def main_worker(ngpus_per_node, args):
     tensor_writer = SummaryWriter(log_dir)
 
     if args.evaluate:
-        # validate(test_loader, model, criterion, 0, True, args, tensor_writer)
+        validate(test_loader, model, criterion, 0, True, args, tensor_writer)
         # 从test_loader中取出第一张图片，然后进行测试
         img = test_loader.dataset[0][0]
         # test_1_pic(model, img, args)
