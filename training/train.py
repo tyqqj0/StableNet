@@ -49,13 +49,17 @@ def train(train_loader, model, criterion, optimizer, epoch, args, tensor_writer=
         target = target.cuda(args.gpu, non_blocking=True)
 
         output, cfeatures = model(images)
+
+
         if args.distributed is False and args.gpu is None:
             # 当使用多GPU训练时，模型实际保存位置在model.module中
             # 因此需要从model.module中获取参数
             pre_features, pre_weight1 = model.module.get_prefeatures()
         else:
             pre_features, pre_weight1 = model.get_prefeatures()
-
+        # 输出pre_features, pre_weight1
+        print('pre_features', pre_features[0:10])
+        print('pre_weight1', pre_weight1[0:10])
         if epoch >= args.epochp:
             weight1, pre_features, pre_weight1 = weight_learner(cfeatures, pre_features, pre_weight1, args, epoch, i)
 
