@@ -10,10 +10,10 @@ def weight_learner(cfeatures, pre_features, pre_weight1, args, global_epoch=0, i
     softmax = nn.Softmax(0)
     weight = Variable(torch.ones(cfeatures.size()[0], 1).cuda())  # TODO:这里的weight是什么 取0维应该是样本数
     print('--------------------------------------')
-    print('weight size', weight.size())
-    print('cfeatures size', cfeatures.size())
-    print('pre_features size', pre_features.size())
-    print('pre_weight1 size', pre_weight1.size())
+    # print('weight size', weight.size())
+    # print('cfeatures size', cfeatures.size())
+    # print('pre_features size', pre_features.size())
+    # print('pre_weight1 size', pre_weight1.size())
     print('--------------------------------------')
     weight.requires_grad = True
     cfeaturec = Variable(torch.FloatTensor(cfeatures.size()).cuda())
