@@ -19,7 +19,7 @@ from training.reweighting import weight_learner
 
 # 检查每个类别和和哪些特征相关
 
-def compute_correlation(output, cfeatures):
+def compute_correlation(output, cfeatures, batch_size):
     # 计算 output 和 cfeatures 的均值
     output_mean = output.mean(dim=0, keepdim=True)
     cfeatures_mean = cfeatures.mean(dim=0, keepdim=True)
@@ -76,7 +76,7 @@ def train(train_loader, model, criterion, optimizer, epoch, args, tensor_writer=
         output, cfeatures = model(images)
         ##################################################
         # 计算相关系数矩阵
-        correlation_matrix = compute_correlation(output, cfeatures)
+        correlation_matrix = compute_correlation(output, cfeatures, args.batch_size)
 
         # 找到与每个 output 最相关的 cfeatures
         # most_related_cfeatures_indices = correlation_matrix.argmax(dim=1).tolist()
