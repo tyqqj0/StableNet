@@ -83,7 +83,7 @@ def train(train_loader, model, criterion, optimizer, epoch, args, tensor_writer=
 
         top_k = 5
         most_related_cfeatures_indices = correlation_matrix.topk(top_k, dim=1).indices.tolist()
-
+        print(output.shape)
         # 输出结果
         for output_idx, cfeature_idx in enumerate(most_related_cfeatures_indices):
             print(f"Output {output_idx}({output[output_idx]}) is most related to cfeature {cfeature_idx}")
