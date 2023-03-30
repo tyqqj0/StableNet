@@ -50,7 +50,7 @@ def weight_learner(cfeatures, pre_features, pre_weight1, args, global_epoch=0, i
     else:
         pre_features = pre_features * args.presave_ratio + cfeatures * (1 - args.presave_ratio)
         pre_weight1 = pre_weight1 * args.presave_ratio + weight * (1 - args.presave_ratio)
-    print('pre_features size, pre_weight1 size\n\n----', pre_features.size(), pre_weight1.size())
+    # print('pre_features size, pre_weight1 size\n\n----', pre_features.size(), pre_weight1.size())
     softmax_weight = softmax(weight)
 
     return softmax_weight, pre_features, pre_weight1
