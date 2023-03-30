@@ -50,7 +50,6 @@ def train(train_loader, model, criterion, optimizer, epoch, args, tensor_writer=
 
         output, cfeatures = model(images)
 
-
         if args.distributed is False and args.gpu is None:
             # 当使用多GPU训练时，模型实际保存位置在model.module中
             # 因此需要从model.module中获取参数
@@ -73,9 +72,9 @@ def train(train_loader, model, criterion, optimizer, epoch, args, tensor_writer=
             model.pre_features.data.copy_(pre_features)
             model.pre_weight1.data.copy_(pre_weight1)
         loss = criterion(output, target)
-        print("loss before reweighing", loss.shape, loss)
+        print("loss before reweighing\n", loss.shape, '\n', loss)
         loss = loss.view(1, -1).mm(weight1).view(1)  #
-        print("loss after reweighing", loss.shape, loss)
+        print("loss after reweighing\n", loss.shape, '\n', loss)
         acc1, acc5 = accuracy(output, target, topk=(1, 5))
         losses.update(loss.item(), images.size(0))
         top1.update(acc1[0], images.size(0))
