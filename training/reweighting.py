@@ -31,6 +31,12 @@ def weight_learner(cfeatures, pre_features, pre_weight1, args, global_epoch=0, i
         lambdap = args.lambdap * max((args.lambda_decay_rate ** (global_epoch // args.lambda_decay_epoch)),
                                      args.min_lambda_times)
         lossg = lossb / lambdap + lossp
+        print(".......................................")
+        print("lossb", lossb)
+        print("lossp", lossp)
+        print("lambdap", lambdap)
+        print("lossg", lossg)
+        print(".......................................")
         if global_epoch == 0:
             lossg = lossg * args.first_step_cons
 

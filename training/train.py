@@ -86,7 +86,7 @@ def train(train_loader, model, criterion, optimizer, epoch, args, tensor_writer=
         # print(output.shape)
         # 输出结果
         for output_idx, cfeature_idx in enumerate(most_related_cfeatures_indices):
-            print(f"Output {output_idx}({output[output_idx].argmax()}) is most related to cfeature {cfeature_idx}")
+            print(f"Output label{output[output_idx].argmax()} is most related to cfeature {cfeature_idx}")
         ##################################################
         if args.distributed is False and args.gpu is None:
             # 当使用多GPU训练时，模型实际保存位置在model.module中
